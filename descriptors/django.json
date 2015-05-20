@@ -1,0 +1,14 @@
+{
+	"name": "django",
+	"mig": {
+		"filename": "__init__.py",
+		"filecontent": "^VERSION =",
+		"filepath": "/usr/lib",
+		"target": "tags->>'operator'='IT'"
+	},
+	"ssh": {
+		"action": "egrep",
+		"pattern": "'^VERSION = \\(\\S+, \\S+, \\S+, \\S+, \\S+\\)'",
+		"outputtransform": "django-python"
+	}
+}
