@@ -14,6 +14,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 )
 
 type WFSConfig struct {
@@ -21,6 +22,7 @@ type WFSConfig struct {
 		Descriptors string
 		MIG         string
 		SSHArgs     string
+		SSHWorkers  int
 	}
 }
 
@@ -30,6 +32,24 @@ type fileCandidate struct {
 }
 
 var config WFSConfig
+
+func printResults(res []sshResult) {
+	for _, x := range res {
+		outbuf := make([]string, 0)
+		outbuf = append(outbuf, x.hostname)
+		outbuf = append(outbuf, x.path)
+
+		if x.err != nil {
+			outbuf = append(outbuf, "error")
+			outbuf = append(outbuf, x.err.Error())
+		} else {
+			outbuf = append(outbuf, "ok")
+			outbuf = append(outbuf, x.resultString)
+		}
+
+		fmt.Fprintf(os.Stdout, "%v\n", strings.Join(outbuf, " "))
+	}
+}
 
 func loadConfiguration(path string) (err error) {
 	err = gcfg.ReadFileInto(&config, path)

@@ -10,14 +10,31 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"os"
 	"os/exec"
 	"strings"
 	"syscall"
 )
 
-func sshQuery(cand fileCandidate, desc *descriptor) (ret string, err error) {
-	fmt.Fprintf(os.Stdout, "[ssh] %v (%v) [%v]\n", cand.hostname, cand.path, desc.SSH.Pattern)
+type retCodeError struct {
+	s       string
+	retcode int
+}
+
+func (e *retCodeError) Error() string {
+	return e.s
+}
+
+type sshResult struct {
+	err          error
+	resultString string
+	hostname     string
+	path         string
+}
+
+func sshQuery(cand fileCandidate, desc *descriptor, resch chan sshResult) {
+	ret := sshResult{}
+	ret.hostname = cand.hostname
+	ret.path = cand.path
 
 	sshArguments := make([]string, 0)
 
@@ -29,14 +46,19 @@ func sshQuery(cand fileCandidate, desc *descriptor) (ret string, err error) {
 	cmd := exec.Command("/usr/bin/ssh", sshArguments...)
 	outpipe, err := cmd.StdoutPipe()
 	if err != nil {
-		return ret, err
+		ret.err = err
+		resch <- ret
+		return
 	}
 	rdr := bufio.NewReader(outpipe)
 	err = cmd.Start()
 	if err != nil {
-		return ret, err
+		ret.err = err
+		resch <- ret
+		return
 	}
 	linebuf, _ := rdr.ReadString('\n')
+	linebuf = strings.Trim(linebuf, "\r\n")
 	err = cmd.Wait()
 	if err != nil {
 		if exerr, ok := err.(*exec.ExitError); ok {
@@ -45,17 +67,31 @@ func sshQuery(cand fileCandidate, desc *descriptor) (ret string, err error) {
 				if exitcode == 1 {
 					// egrep did not find the content, this
 					// is not treated as an error.
-					return ret, nil
+					resch <- ret
+					return
 				}
-				fmt.Fprintf(os.Stdout, "[warn] %v (ssh ret: %v)\n", cand.hostname, exitcode)
-				return ret, nil
+				// Some other return code was returned we
+				// did not expect, return this as a result
+				// to the main routine. This can occur for
+				// example of the SSH connection fails.
+				nerr := retCodeError{}
+				nerr.retcode = exitcode
+				nerr.s = fmt.Sprintf("command failed with return code %v", exitcode)
+				ret.err = &nerr
+				resch <- ret
+				return
 			}
 		}
-		return ret, err
+		ret.err = err
+		resch <- ret
+		return
 	}
-	ret, err = transform(linebuf, desc.SSH.OVT)
+	linebuf, err = transform(linebuf, desc.SSH.OVT)
 	if err != nil {
-		return "", err
+		ret.err = err
+		resch <- ret
+		return
 	}
-	return ret, nil
+	ret.resultString = linebuf
+	resch <- ret
 }

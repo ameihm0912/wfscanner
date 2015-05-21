@@ -18,6 +18,7 @@ type transformTableEnt struct {
 }
 
 var transformTable = []transformTableEnt{
+	{"none", transformNone},
 	{"django-python", transformDjangoPython},
 }
 
@@ -28,6 +29,10 @@ func transform(inbuf string, t string) (string, error) {
 		}
 	}
 	return "", fmt.Errorf("invalid transform specified: %v", t)
+}
+
+func transformNone(inbuf string) (string, error) {
+	return inbuf, nil
 }
 
 func transformDjangoPython(inbuf string) (string, error) {

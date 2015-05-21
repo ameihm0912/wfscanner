@@ -71,15 +71,52 @@ func (d *descriptor) run() (err error) {
 	if err != nil {
 		return err
 	}
-	for _, x := range clist {
-		outbuf, err := sshQuery(x, d)
-		if err != nil {
-			return err
+
+	curworkers := 0
+	maxworkers := config.Main.SSHWorkers
+	resultChan := make(chan sshResult)
+	results := make([]sshResult, 0)
+	left := len(clist)
+	for i, x := range clist {
+		for {
+			nodata := false
+			select {
+			case res := <-resultChan:
+				results = append(results, res)
+				curworkers--
+				left--
+			default:
+				nodata = true
+			}
+			if nodata {
+				break
+			}
 		}
-		if outbuf == "" {
-			outbuf = "none"
+
+		if left == 0 {
+			break
 		}
-		fmt.Fprintf(os.Stdout, "[result] %v %v (%v) %v\n", d.Name, x.hostname, x.path, outbuf)
+
+		rem := len(clist) - i
+		fmt.Fprintf(os.Stderr, "[descriptor] new worker for %v (%v left)\n", x.hostname, rem)
+		go sshQuery(x, d, resultChan)
+		curworkers++
+
+		if curworkers == maxworkers {
+			res := <-resultChan
+			results = append(results, res)
+			curworkers--
+			left--
+		}
 	}
+
+	for left > 0 {
+		res := <-resultChan
+		results = append(results, res)
+		curworkers--
+		left--
+	}
+
+	printResults(results)
 	return err
 }
