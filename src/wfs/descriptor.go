@@ -24,6 +24,7 @@ type descriptorMig struct {
 	FileContent string `json:"filecontent"`
 	FilePath    string `json:"filepath"`
 	Target      string `json:"target"`
+	PostFilter  string `json:"postfilter"`
 }
 
 func (d *descriptorMig) buildMigArguments() (ret []string, err error) {

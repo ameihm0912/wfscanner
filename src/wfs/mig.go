@@ -12,11 +12,16 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 )
 
 func migGetCandidates(desc descriptorMig) (cand []fileCandidate, err error) {
 	fmt.Fprintf(os.Stdout, "[descriptor] executing mig query\n")
+	var pfre *regexp.Regexp
+	if desc.PostFilter != "" {
+		pfre = regexp.MustCompile(desc.PostFilter)
+	}
 	migargs, err := desc.buildMigArguments()
 	if err != nil {
 		return cand, err
@@ -36,6 +41,11 @@ func migGetCandidates(desc descriptorMig) (cand []fileCandidate, err error) {
 		elem := strings.Fields(buf)
 		if len(elem) < 2 {
 			return cand, fmt.Errorf("malformed output from mig: %v", buf)
+		}
+		if pfre != nil {
+			if !pfre.MatchString(elem[1]) {
+				continue
+			}
 		}
 		cand = append(cand, fileCandidate{elem[0], elem[1]})
 	}
