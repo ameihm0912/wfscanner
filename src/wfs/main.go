@@ -22,6 +22,7 @@ type WFSConfig struct {
 	Main struct {
 		Descriptors string
 		MIG         string
+		SSHArgs     string
 	}
 }
 

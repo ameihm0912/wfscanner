@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 	"syscall"
 )
 
@@ -19,8 +20,12 @@ func sshQuery(cand fileCandidate, desc *descriptor) (ret string, err error) {
 	fmt.Fprintf(os.Stdout, "[ssh] %v (%v) [%v]\n", cand.hostname, cand.path, desc.SSH.Pattern)
 
 	sshArguments := make([]string, 0)
-	sshArguments = append(sshArguments, "-q", cand.hostname)
+
+	configArgs := strings.Fields(config.Main.SSHArgs)
+	sshArguments = append(sshArguments, configArgs...)
+	sshArguments = append(sshArguments, cand.hostname)
 	sshArguments = append(sshArguments, "egrep", desc.SSH.Pattern, cand.path)
+
 	cmd := exec.Command("/usr/bin/ssh", sshArguments...)
 	outpipe, err := cmd.StdoutPipe()
 	if err != nil {
