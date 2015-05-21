@@ -12,10 +12,8 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
-	"strings"
 )
 
 type WFSConfig struct {
@@ -32,51 +30,43 @@ type fileCandidate struct {
 }
 
 var config WFSConfig
-var descmap map[string]descriptor
 
 func loadConfiguration(path string) (err error) {
 	err = gcfg.ReadFileInto(&config, path)
 	return err
 }
 
-func loadDescriptors(dirpath string) (err error) {
-	files, err := ioutil.ReadDir(dirpath)
+func loadDescriptor(descname string, dirpath string) (ret descriptor, err error) {
+	fpath := path.Join(dirpath, descname+".json")
+	fd, err := os.Open(fpath)
 	if err != nil {
-		return err
+		return ret, err
 	}
-	for _, x := range files {
-		fpath := path.Join(dirpath, x.Name())
-		if !strings.HasSuffix(fpath, ".json") {
-			continue
-		}
-		fd, err := os.Open(fpath)
-		if err != nil {
-			return err
-		}
-		dec := json.NewDecoder(fd)
-		newdesc := descriptor{}
-		err = dec.Decode(&newdesc)
-		fd.Close()
-		if err != nil {
-			return err
-		}
-		err = newdesc.validate()
-		if err != nil {
-			return err
-		}
-		descmap[newdesc.Name] = newdesc
-		fmt.Fprintf(os.Stdout, "[info] loaded descriptor %v\n", newdesc.Name)
+	dec := json.NewDecoder(fd)
+	err = dec.Decode(&ret)
+	fd.Close()
+	if err != nil {
+		return ret, err
 	}
-	return err
+	err = ret.validate()
+	if err != nil {
+		return ret, err
+	}
+	return ret, err
 }
 
 func main() {
 	var confpath string
 
-	descmap = make(map[string]descriptor)
-
 	flag.StringVar(&confpath, "c", "./wfs.cfg", "path to wfs.cfg")
 	flag.Parse()
+	args := flag.Args()
+
+	if len(args) != 1 {
+		fmt.Fprint(os.Stderr, "error: must specify descriptor name as argument\n")
+		os.Exit(1)
+	}
+	descname := args[0]
 
 	err := loadConfiguration(confpath)
 	if err != nil {
@@ -84,18 +74,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	err = loadDescriptors(config.Main.Descriptors)
+	desc, err := loadDescriptor(descname, config.Main.Descriptors)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}
 
-	for i := range descmap {
-		mapentry := descmap[i]
-		err = mapentry.run()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "error running %v: %v\n", i, err)
-			os.Exit(1)
-		}
+	err = desc.run()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
 	}
 }
