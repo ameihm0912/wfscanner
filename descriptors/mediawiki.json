@@ -1,0 +1,15 @@
+{
+	"name": "mediawiki",
+	"mig": {
+		"filename": "PHPVersionError.php",
+		"filecontent": "mwVersion =",
+		"filepath": "/",
+		"target": "tags->>'operator'='IT'",
+		"postfilter": ""
+	},
+	"ssh": {
+		"action": "egrep",
+		"pattern": "'mwVersion ='",
+		"outputtransform": "none"
+	}
+}
