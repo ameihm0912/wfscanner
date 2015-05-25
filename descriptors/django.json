@@ -2,7 +2,7 @@
 	"name": "django",
 	"mig": {
 		"filename": "__init__.py",
-		"filecontent": "^VERSION =",
+		"filecontent": "^VERSION = \\(\\S+, \\S+, \\S+, \\S+, \\S+\\)$",
 		"filepath": "/",
 		"target": "tags->>'operator'='IT'",
 		"postfilter": "django",
