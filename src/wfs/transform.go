@@ -20,6 +20,7 @@ type transformTableEnt struct {
 var transformTable = []transformTableEnt{
 	{"none", transformNone},
 	{"django-python", transformDjangoPython},
+	{"mediawiki-mwver", transformMediaWikimwVer},
 }
 
 func transform(inbuf string, t string) (string, error) {
@@ -33,6 +34,15 @@ func transform(inbuf string, t string) (string, error) {
 
 func transformNone(inbuf string) (string, error) {
 	return inbuf, nil
+}
+
+func transformMediaWikimwVer(inbuf string) (string, error) {
+	re := regexp.MustCompile("= '(\\S+)';")
+	buf := re.FindStringSubmatch(inbuf)
+	if len(buf) != 2 {
+		return "", fmt.Errorf("transform mediawiki-mwver: invalid input \"%v\"", inbuf)
+	}
+	return buf[1], nil
 }
 
 func transformDjangoPython(inbuf string) (string, error) {

@@ -6,11 +6,11 @@
 		"filepath": "/",
 		"target": "tags->>'operator'='IT'",
 		"postfilter": "",
-		"expiry": "30s"
+		"expiry": "60s"
 	},
 	"ssh": {
 		"action": "egrep",
 		"pattern": "'mwVersion ='",
-		"outputtransform": "none"
+		"outputtransform": "mediawiki-mwver"
 	}
 }
