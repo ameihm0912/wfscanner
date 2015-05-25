@@ -6,7 +6,7 @@
 		"filepath": "/",
 		"target": "tags->>'operator'='IT'",
 		"postfilter": "",
-		"expiry": "60s"
+		"expiry": "300s"
 	},
 	"ssh": {
 		"action": "egrep",
