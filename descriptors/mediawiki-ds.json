@@ -1,0 +1,16 @@
+{
+	"name": "mediawiki-ds",
+	"mig": {
+		"filename": "DefaultSettings.php",
+		"filecontent": "wgVersion =",
+		"filepath": "/",
+		"target": "tags->>'operator'='IT'",
+		"postfilter": "",
+		"expiry": "300s"
+	},
+	"ssh": {
+		"action": "egrep",
+		"pattern": "'wgVersion ='",
+		"outputtransform": "mediawiki-mwver"
+	}
+}
