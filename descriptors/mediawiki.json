@@ -5,7 +5,8 @@
 		"filecontent": "mwVersion =",
 		"filepath": "/",
 		"target": "tags->>'operator'='IT'",
-		"postfilter": ""
+		"postfilter": "",
+		"expiry": "30s"
 	},
 	"ssh": {
 		"action": "egrep",

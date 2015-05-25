@@ -5,7 +5,8 @@
 		"filecontent": "^VERSION =",
 		"filepath": "/usr/lib",
 		"target": "tags->>'operator'='IT'",
-		"postfilter": "django"
+		"postfilter": "django",
+		"expiry": "30s"
 	},
 	"ssh": {
 		"action": "egrep",

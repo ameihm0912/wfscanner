@@ -24,6 +24,7 @@ type descriptorMig struct {
 	FileContent string `json:"filecontent"`
 	FilePath    string `json:"filepath"`
 	Target      string `json:"target"`
+	Expiry      string `json:"expiry"`
 	PostFilter  string `json:"postfilter"`
 }
 
@@ -33,6 +34,9 @@ func (d *descriptorMig) buildMigArguments() (ret []string, err error) {
 	ret = append(ret, "file")
 	if d.Target != "" {
 		ret = append(ret, "-t", d.Target)
+	}
+	if d.Expiry != "" {
+		ret = append(ret, "-e", d.Expiry)
 	}
 	if d.Filename != "" {
 		ret = append(ret, "-name", d.Filename)
@@ -61,6 +65,9 @@ func (d *descriptor) validate() (err error) {
 	}
 	if d.SSH.Pattern == "" {
 		return errors.New("ssh egrep pattern value must be set in descriptor")
+	}
+	if d.Mig.Expiry == "" {
+		return errors.New("mig section must have an expiry specified")
 	}
 	return err
 }
