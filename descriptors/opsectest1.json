@@ -1,0 +1,16 @@
+{
+	"name": "opsectest1",
+	"mig": {
+		"filename": "hosts",
+		"filecontent": "mozilla",
+		"filepath": "/etc",
+		"target": "name like '%mozdef%'",
+		"postfilter": "",
+		"expiry": "30s"
+	},
+	"ssh": {
+		"action": "egrep",
+		"pattern": "'localhost'",
+		"outputtransform": "none"
+	}
+}
