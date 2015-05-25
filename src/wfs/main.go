@@ -23,6 +23,8 @@ type WFSConfig struct {
 		MIG         string
 		SSHArgs     string
 		SSHWorkers  int
+		KeyID       string
+		SecRing     string
 	}
 }
 
@@ -95,6 +97,12 @@ func main() {
 	}
 
 	desc, err := loadDescriptor(descname, config.Main.Descriptors)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+
+	err = pgpCacheKeys(config.Main.SecRing)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
