@@ -3,14 +3,14 @@
 	"mig": {
 		"filename": "__init__.py",
 		"filecontent": "^VERSION =",
-		"filepath": "/usr/lib",
+		"filepath": "/",
 		"target": "tags->>'operator'='IT'",
 		"postfilter": "django",
-		"expiry": "30s"
+		"expiry": "60s"
 	},
 	"ssh": {
 		"action": "egrep",
-		"pattern": "'^VERSION = \\(\\S+, \\S+, \\S+, \\S+, \\S+\\)'",
+		"pattern": "'^VERSION = \\([^ ]+, [^ ]+, [^ ]+, [^ ]+, [^ ]\\)$'",
 		"outputtransform": "django-python"
 	}
 }
