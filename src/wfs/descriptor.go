@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"regexp"
 )
 
 type descriptorSSH struct {
@@ -56,7 +57,7 @@ type descriptor struct {
 	SSH  descriptorSSH `json:"ssh"`
 }
 
-func (d *descriptor) validate() (err error) {
+func (d *descriptor) validate() error {
 	if d.Name == "" {
 		return errors.New("descriptor must have a name")
 	}
@@ -66,10 +67,28 @@ func (d *descriptor) validate() (err error) {
 	if d.SSH.Pattern == "" {
 		return errors.New("ssh egrep pattern value must be set in descriptor")
 	}
+	if d.SSH.OVT == "" {
+		return errors.New("ssh section must have output transform specified")
+	}
 	if d.Mig.Expiry == "" {
 		return errors.New("mig section must have an expiry specified")
 	}
-	return err
+	if d.Mig.Filename == "" {
+		return errors.New("mig section must have filename specified")
+	}
+
+	_, err := regexp.Compile(d.SSH.Pattern)
+	if err != nil {
+		return err
+	}
+	if d.Mig.FileContent != "" {
+		_, err := regexp.Compile(d.Mig.FileContent)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (d *descriptor) run() (err error) {
