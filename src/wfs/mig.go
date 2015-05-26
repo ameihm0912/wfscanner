@@ -24,7 +24,7 @@ import (
 // agent to return. We need a workaround to detect this scenario, or a way
 // to tell MIG to immediately return if the key needs to be decrypted.
 func migGetCandidates(desc descriptorMig) (cand []fileCandidate, err error) {
-	fmt.Fprintf(os.Stdout, "[descriptor] executing mig query\n")
+	fmt.Fprintf(os.Stderr, "[descriptor] executing mig query\n")
 
 	var pfre *regexp.Regexp
 	if desc.PostFilter != "" {
@@ -63,6 +63,6 @@ func migGetCandidates(desc descriptorMig) (cand []fileCandidate, err error) {
 		}
 		cand = append(cand, fileCandidate{elem[0], elem[1]})
 	}
-	fmt.Fprintf(os.Stdout, "[descriptor] %v candidates returned by mig\n", len(cand))
+	fmt.Fprintf(os.Stderr, "[descriptor] %v candidates returned by mig\n", len(cand))
 	return cand, err
 }

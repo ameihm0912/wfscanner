@@ -92,7 +92,7 @@ func (d *descriptor) validate() error {
 }
 
 func (d *descriptor) run() (err error) {
-	fmt.Fprintf(os.Stdout, "[descriptor] running %v\n", d.Name)
+	fmt.Fprintf(os.Stderr, "[descriptor] running %v\n", d.Name)
 	clist, err := migGetCandidates(d.Mig)
 	if err != nil {
 		return err
