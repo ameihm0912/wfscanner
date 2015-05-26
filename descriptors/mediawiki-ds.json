@@ -12,5 +12,8 @@
 		"action": "egrep",
 		"pattern": "'wgVersion ='",
 		"outputtransform": "mediawiki-mwver"
+	},
+	"result": {
+		"trim": 2
 	}
 }
