@@ -51,7 +51,7 @@ func (d *descriptorMig) buildMigArguments() (ret []string, err error) {
 			ret = append(ret, "-e", d.Expiry)
 		}
 	} else {
-		fmt.Fprintf(os.Stderr, "[mig] override action expiry with '%v'\n", expiryOverride)
+		fmt.Fprintf(os.Stderr, "[mig] overriding action expiry with '%v'\n", expiryOverride)
 		ret = append(ret, "-e", expiryOverride)
 	}
 	if d.Filename != "" {
