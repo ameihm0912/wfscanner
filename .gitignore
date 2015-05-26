@@ -4,3 +4,4 @@ pkg/
 src/camlistore.org/
 src/golang.org/
 src/code.google.com/
+*.swp
