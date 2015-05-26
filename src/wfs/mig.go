@@ -16,13 +16,6 @@ import (
 	"strings"
 )
 
-// XXX This function expects the GPG passphrase used by mig to have already
-// been cached by the GPG agent. If it's not, pinentry will be called in this
-// function and depending on the system the input dialog may not show up.
-//
-// When this happens the process will be waiting for the call into GPG
-// agent to return. We need a workaround to detect this scenario, or a way
-// to tell MIG to immediately return if the key needs to be decrypted.
 func migGetCandidates(desc descriptorMig) (cand []fileCandidate, err error) {
 	fmt.Fprintf(os.Stderr, "[descriptor] executing mig query\n")
 
