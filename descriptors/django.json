@@ -12,5 +12,8 @@
 		"action": "egrep",
 		"pattern": "'^VERSION = \\([^ ]+, [^ ]+, [^ ]+, [^ ]+, [^ ]\\)$'",
 		"outputtransform": "django-python"
+	},
+	"result": {
+		"trim": 1
 	}
 }
