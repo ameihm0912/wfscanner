@@ -39,6 +39,7 @@ type Result struct {
 }
 
 var config WFSConfig
+var targetOverride string
 
 func printResults(res []Result) {
 	for _, x := range res {
@@ -92,6 +93,7 @@ func main() {
 	var confpath string
 
 	flag.StringVar(&confpath, "c", "./wfs.cfg", "path to wfs.cfg")
+	flag.StringVar(&targetOverride, "t", "", "override descriptor mig target")
 	flag.Parse()
 	args := flag.Args()
 

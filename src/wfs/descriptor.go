@@ -38,8 +38,13 @@ func (d *descriptorMig) buildMigArguments() (ret []string, err error) {
 	// Note err is unused here and will always be nil, but may be used
 	// in the future.
 	ret = append(ret, "file")
-	if d.Target != "" {
-		ret = append(ret, "-t", d.Target)
+	if targetOverride == "" {
+		if d.Target != "" {
+			ret = append(ret, "-t", d.Target)
+		}
+	} else {
+		fmt.Fprintf(os.Stderr, "[mig] overriding mig target with '%v'\n", targetOverride)
+		ret = append(ret, "-t", targetOverride)
 	}
 	if d.Expiry != "" {
 		ret = append(ret, "-e", d.Expiry)
