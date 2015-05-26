@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strings"
 )
 
 type descriptorSSH struct {
@@ -27,6 +28,10 @@ type descriptorMig struct {
 	Target      string `json:"target"`
 	Expiry      string `json:"expiry"`
 	PostFilter  string `json:"postfilter"`
+}
+
+type descriptorResult struct {
+	Trim int `json:"trim"`
 }
 
 func (d *descriptorMig) buildMigArguments() (ret []string, err error) {
@@ -52,9 +57,10 @@ func (d *descriptorMig) buildMigArguments() (ret []string, err error) {
 }
 
 type descriptor struct {
-	Name string        `json:"name"`
-	Mig  descriptorMig `json:"mig"`
-	SSH  descriptorSSH `json:"ssh"`
+	Name string           `json:"name"`
+	Mig  descriptorMig    `json:"mig"`
+	SSH  descriptorSSH    `json:"ssh"`
+	Res  descriptorResult `json:"result"`
 }
 
 func (d *descriptor) validate() error {
@@ -76,6 +82,11 @@ func (d *descriptor) validate() error {
 	if d.Mig.Filename == "" {
 		return errors.New("mig section must have filename specified")
 	}
+	if d.Res.Trim != 0 {
+		if d.Res.Trim < 0 {
+			return errors.New("trim must be > 0")
+		}
+	}
 
 	_, err := regexp.Compile(d.SSH.Pattern)
 	if err != nil {
@@ -91,6 +102,28 @@ func (d *descriptor) validate() error {
 	return nil
 }
 
+func resultPathTrim(n int, s string) (string, error) {
+	sbuf := strings.Split(s, "/")
+	if len(sbuf) <= n {
+		return "", errors.New("not enough elements in path to trim")
+	}
+	ret := strings.Join(sbuf[0:len(sbuf)-n], "/")
+	return ret, nil
+}
+
+func (d *descriptor) makeResult(s sshResult) (Result, error) {
+	ret := Result{ssh: s}
+	ret.resultPath = s.path
+	if d.Res.Trim != 0 {
+		var err error
+		ret.resultPath, err = resultPathTrim(d.Res.Trim, ret.resultPath)
+		if err != nil {
+			return ret, err
+		}
+	}
+	return ret, nil
+}
+
 func (d *descriptor) run() (err error) {
 	fmt.Fprintf(os.Stderr, "[descriptor] running %v\n", d.Name)
 	clist, err := migGetCandidates(d.Mig)
@@ -101,14 +134,18 @@ func (d *descriptor) run() (err error) {
 	curworkers := 0
 	maxworkers := config.Main.SSHWorkers
 	resultChan := make(chan sshResult)
-	results := make([]sshResult, 0)
+	results := make([]Result, 0)
 	left := len(clist)
 	for i, x := range clist {
 		for {
 			nodata := false
 			select {
 			case res := <-resultChan:
-				results = append(results, res)
+				newres, err := d.makeResult(res)
+				if err != nil {
+					return err
+				}
+				results = append(results, newres)
 				curworkers--
 				left--
 			default:
@@ -130,7 +167,11 @@ func (d *descriptor) run() (err error) {
 
 		if curworkers == maxworkers {
 			res := <-resultChan
-			results = append(results, res)
+			newres, err := d.makeResult(res)
+			if err != nil {
+				return err
+			}
+			results = append(results, newres)
 			curworkers--
 			left--
 		}
@@ -138,7 +179,11 @@ func (d *descriptor) run() (err error) {
 
 	for left > 0 {
 		res := <-resultChan
-		results = append(results, res)
+		newres, err := d.makeResult(res)
+		if err != nil {
+			return err
+		}
+		results = append(results, newres)
 		curworkers--
 		left--
 	}

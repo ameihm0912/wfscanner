@@ -12,5 +12,8 @@
 		"action": "egrep",
 		"pattern": "'localhost'",
 		"outputtransform": "none"
+	},
+	"result": {
+		"trim": 1
 	}
 }

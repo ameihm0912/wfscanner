@@ -33,20 +33,31 @@ type fileCandidate struct {
 	path     string
 }
 
+type Result struct {
+	ssh        sshResult
+	resultPath string
+}
+
 var config WFSConfig
 
-func printResults(res []sshResult) {
+func printResults(res []Result) {
 	for _, x := range res {
 		outbuf := make([]string, 0)
-		outbuf = append(outbuf, x.hostname)
-		outbuf = append(outbuf, x.path)
+		outbuf = append(outbuf, x.ssh.hostname)
+		outbuf = append(outbuf, x.ssh.path)
 
-		if x.err != nil {
+		if x.ssh.err != nil {
 			outbuf = append(outbuf, "error")
-			outbuf = append(outbuf, x.err.Error())
+			outbuf = append(outbuf, "-")
+			outbuf = append(outbuf, x.ssh.err.Error())
 		} else {
 			outbuf = append(outbuf, "ok")
-			outbuf = append(outbuf, x.resultString)
+			if x.resultPath != "" {
+				outbuf = append(outbuf, x.resultPath)
+			} else {
+				outbuf = append(outbuf, "-")
+			}
+			outbuf = append(outbuf, x.ssh.resultString)
 		}
 
 		fmt.Fprintf(os.Stdout, "%v\n", strings.Join(outbuf, " "))
