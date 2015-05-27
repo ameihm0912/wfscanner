@@ -61,8 +61,13 @@ func (d *descriptorMig) buildMigArguments() (ret []string, err error) {
 	if d.FileDepth != "" {
 		ret = append(ret, "-maxdepth", d.FileDepth)
 	}
-	if d.FilePath != "" {
-		ret = append(ret, "-path", d.FilePath)
+	if pathOverride == "" {
+		if d.FilePath != "" {
+			ret = append(ret, "-path", d.FilePath)
+		}
+	} else {
+		fmt.Fprintf(os.Stderr, "[mig] overriding path with '%v'\n", pathOverride)
+		ret = append(ret, "-path", pathOverride)
 	}
 	if d.FileContent != "" {
 		ret = append(ret, "-content", d.FileContent)
