@@ -25,6 +25,7 @@ type descriptorMig struct {
 	Filename    string `json:"filename"`
 	FileContent string `json:"filecontent"`
 	FilePath    string `json:"filepath"`
+	FileDepth   string `json:"filedepth"`
 	Target      string `json:"target"`
 	Expiry      string `json:"expiry"`
 	PostFilter  string `json:"postfilter"`
@@ -56,6 +57,9 @@ func (d *descriptorMig) buildMigArguments() (ret []string, err error) {
 	}
 	if d.Filename != "" {
 		ret = append(ret, "-name", d.Filename)
+	}
+	if d.FileDepth != "" {
+		ret = append(ret, "-maxdepth", d.FileDepth)
 	}
 	if d.FilePath != "" {
 		ret = append(ret, "-path", d.FilePath)
