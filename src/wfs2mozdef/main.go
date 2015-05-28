@@ -42,9 +42,8 @@ func makeEvent(args []string) (gozdef.VulnEvent, error) {
 	}
 	e.Asset.Hostname = args[0]
 
-	e.Vuln.Status = "open"
+	e.Vuln.Status = "unknown"
 	e.Vuln.VulnID = checkName
-	e.Vuln.Proof = args[1]
 	e.Vuln.Title = args[3]
 
 	e.Vuln.Description = strings.Join(args[4:len(args)], " ")
@@ -93,7 +92,10 @@ func getAssetID(hostname string, title string) (int, error) {
 }
 
 func main() {
+	var filterPath string
+
 	flag.StringVar(&aidFile, "a", "", "asset id file")
+	flag.StringVar(&filterPath, "f", "", "load and use filter at path")
 	flag.StringVar(&checkName, "n", "", "name describing output")
 	flag.StringVar(&mozdef, "m", "", "post json data to MozDef")
 	flag.Parse()
@@ -113,6 +115,14 @@ func main() {
 	}
 	if sourceName == "" {
 		sourceName = "wfs"
+	}
+
+	if filterPath != "" {
+		err := loadFilter(filterPath)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			os.Exit(1)
+		}
 	}
 
 	fd, err := os.Open(args[0])
@@ -138,6 +148,14 @@ func main() {
 	if err := scanner.Err(); err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
+	}
+
+	for i := range vulnEvents {
+		err := applyFilter(&vulnEvents[i])
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			os.Exit(1)
+		}
 	}
 
 	var pub gozdef.Publisher
