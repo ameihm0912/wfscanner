@@ -1,0 +1,47 @@
+{
+	"name": "mediawiki",
+	"lastupdated": "2015-05-28T18:30:00.000000+00:00",
+
+	"filters": [
+	{
+		"value": "1\\.23\\.9",
+		"ok": true,
+		"description": "Current 1.23 release",
+		"entryts": "2015-05-28T18:30:00.000000+00:00"
+	},
+	{
+		"value": "1\\.24\\.2",
+		"ok": true,
+		"description": "Current 1.24 release",
+		"entryts": "2015-05-28T18:30:00.000000+00:00"
+	},
+	{
+		"value": "1\\.19",
+		"ok": false,
+		"description": "1.19 is EOL and is unsupported",
+		"entryts": "2015-05-28T18:30:00.000000+00:00",
+		"impact": "high"
+	},
+	{
+		"value": "1\\.17",
+		"ok": false,
+		"description": "1.17 is EOL and is unsupported",
+		"entryts": "2015-05-28T18:30:00.000000+00:00",
+		"impact": "high"
+	},
+	{
+		"value": "1\\.16",
+		"ok": false,
+		"description": "1.16 is EOL and is unsupported",
+		"entryts": "2015-05-28T18:30:00.000000+00:00",
+		"impact": "high"
+	},
+	{
+		"value": "",
+		"ok": false,
+		"description": "Revision not in filter list",
+		"entryts": "2015-05-28T18:30:00.000000+00:00",
+		"impact": "high"
+	}
+	]
+}
