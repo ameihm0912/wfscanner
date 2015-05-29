@@ -36,16 +36,19 @@ type fileCandidate struct {
 type Result struct {
 	ssh        sshResult
 	resultPath string
+	resultName string
 }
 
 var config WFSConfig
 var pathOverride string
 var targetOverride string
 var expiryOverride string
+var nameOverride string
 
 func printResults(res []Result) {
 	for _, x := range res {
 		outbuf := make([]string, 0)
+		outbuf = append(outbuf, x.resultName)
 		outbuf = append(outbuf, x.ssh.hostname)
 		outbuf = append(outbuf, x.ssh.path)
 
@@ -98,6 +101,7 @@ func main() {
 	flag.StringVar(&targetOverride, "t", "", "override descriptor mig target")
 	flag.StringVar(&expiryOverride, "e", "", "override descriptor mig action expiry")
 	flag.StringVar(&pathOverride, "p", "", "override descriptor mig path")
+	flag.StringVar(&nameOverride, "n", "", "override descriptor name for results")
 	flag.Parse()
 	args := flag.Args()
 

@@ -133,6 +133,11 @@ func resultPathTrim(n int, s string) (string, error) {
 func (d *descriptor) makeResult(s sshResult) (Result, error) {
 	ret := Result{ssh: s}
 	ret.resultPath = s.path
+	if nameOverride != "" {
+		ret.resultName = nameOverride
+	} else {
+		ret.resultName = d.Name
+	}
 	if d.Res.Trim != 0 {
 		var err error
 		ret.resultPath, err = resultPathTrim(d.Res.Trim, ret.resultPath)
