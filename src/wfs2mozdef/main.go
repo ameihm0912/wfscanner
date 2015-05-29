@@ -19,6 +19,14 @@ import (
 	"strings"
 )
 
+type ResultError struct {
+	s string
+}
+
+func (r *ResultError) Error() string {
+	return r.s
+}
+
 var apic gozdef.ApiConf
 
 var mozdef string
@@ -34,6 +42,10 @@ func makeEvent(args []string) (gozdef.VulnEvent, error) {
 
 	e.Description = fmt.Sprintf("wfs check for %v", args[0])
 	e.SourceName = sourceName
+
+	if args[3] != "ok" {
+		return e, &ResultError{fmt.Sprintf("result is error, %v", strings.Join(args[5:len(args)], " "))}
+	}
 
 	e.Asset.AssetID, err = getAssetID(args[1], args[4], args[0])
 	if err != nil {
@@ -135,6 +147,10 @@ func main() {
 		}
 		newevent, err := makeEvent(bufargs)
 		if err != nil {
+			if _, ok := err.(*ResultError); ok {
+				fmt.Fprintf(os.Stderr, "warning: skipping result, %v\n", err)
+				continue
+			}
 			fmt.Fprintf(os.Stderr, "error: %v\n", err)
 			os.Exit(1)
 		}
