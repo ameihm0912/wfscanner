@@ -4,6 +4,7 @@
 		"filename": "PHPVersionError.php",
 		"filecontent": "mwVersion =",
 		"filepath": "/",
+		"filedepth": "10",
 		"target": "tags->>'operator'='IT'",
 		"postfilter": "",
 		"expiry": "300s"
@@ -12,5 +13,8 @@
 		"action": "egrep",
 		"pattern": "'mwVersion ='",
 		"outputtransform": "mediawiki-mwver"
+	},
+	"result": {
+		"trim": 2
 	}
 }
