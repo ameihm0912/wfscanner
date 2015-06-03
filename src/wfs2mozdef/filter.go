@@ -18,9 +18,16 @@ import (
 )
 
 type Filter struct {
-	Name        string        `json:"name"`
-	Entries     []FilterEntry `json:"filters"`
-	LastUpdated time.Time     `json:"lastupdated"`
+	Name        string    `json:"name"`
+	Entries     []Lineage `json:"lineage"`
+	LastUpdated time.Time `json:"lastupdated"`
+}
+
+type Lineage struct {
+	Value   string        `json:"value"`
+	Entries []FilterEntry `json:"filters"`
+
+	valueRegexp *regexp.Regexp
 }
 
 type FilterEntry struct {
@@ -34,7 +41,7 @@ type FilterEntry struct {
 }
 
 var filter Filter
-var defaultEntry *FilterEntry
+var defaultLineage *Lineage
 
 func (f *FilterEntry) apply(v *gozdef.VulnEvent) error {
 	if f.Ok {
@@ -53,8 +60,8 @@ func (f *FilterEntry) apply(v *gozdef.VulnEvent) error {
 	return nil
 }
 
-func applyFilter(v *gozdef.VulnEvent) error {
-	for _, x := range filter.Entries {
+func (l *Lineage) applyLineage(v *gozdef.VulnEvent) error {
+	for _, x := range l.Entries {
 		if x.valueRegexp == nil {
 			continue
 		}
@@ -65,8 +72,23 @@ func applyFilter(v *gozdef.VulnEvent) error {
 			return nil
 		}
 	}
-	if defaultEntry != nil {
-		if err := defaultEntry.apply(v); err != nil {
+	return nil
+}
+
+func applyFilter(v *gozdef.VulnEvent) error {
+	for _, x := range filter.Entries {
+		if x.valueRegexp == nil {
+			continue
+		}
+		if x.valueRegexp.MatchString(v.Vuln.Description) {
+			if err := x.applyLineage(v); err != nil {
+				return err
+			}
+			return nil
+		}
+	}
+	if defaultLineage != nil {
+		if err := defaultLineage.applyLineage(v); err != nil {
 			return nil
 		}
 	}
@@ -85,12 +107,23 @@ func loadFilter(path string) error {
 	}
 	for i := range filter.Entries {
 		if filter.Entries[i].Value == "" {
-			defaultEntry = &filter.Entries[i]
+			defaultLineage = &filter.Entries[i]
 			continue
 		}
 		filter.Entries[i].valueRegexp, err = regexp.Compile(filter.Entries[i].Value)
 		if err != nil {
 			return err
+		}
+		for j := range filter.Entries[i].Entries {
+			var eptr *FilterEntry
+			eptr = &filter.Entries[i].Entries[j]
+			if eptr.Value == "" {
+				continue
+			}
+			eptr.valueRegexp, err = regexp.Compile(eptr.Value)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
