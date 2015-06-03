@@ -34,6 +34,7 @@ type Lineage struct {
 type FilterEntry struct {
 	Description string    `json:"description"`
 	Value       string    `json:"value"`
+	Type        string    `json:"type"`
 	Ok          bool      `json:"ok"`
 	EntryTS     time.Time `json:"entryts"`
 	Impact      string    `json:"impact"`
@@ -63,6 +64,9 @@ func (f *FilterEntry) apply(v *gozdef.VulnEvent) error {
 
 func (l *Lineage) applyLineage(v *gozdef.VulnEvent) error {
 	for _, x := range l.Entries {
+		if x.Type != "anchor" {
+			continue
+		}
 		if x.valueRegexp == nil {
 			continue
 		}
@@ -123,6 +127,10 @@ func loadFilter(path string) error {
 		for j := range filter.Entries[i].Entries {
 			var eptr *FilterEntry
 			eptr = &filter.Entries[i].Entries[j]
+			if eptr.Type != "anchor" {
+				// Only process regexp for anchors
+				continue
+			}
 			if eptr.Value == "" {
 				filter.Entries[i].defaultEntry = eptr
 				continue
