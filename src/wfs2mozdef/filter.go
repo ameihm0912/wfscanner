@@ -27,7 +27,8 @@ type Lineage struct {
 	Value   string        `json:"value"`
 	Entries []FilterEntry `json:"filters"`
 
-	valueRegexp *regexp.Regexp
+	defaultEntry *FilterEntry
+	valueRegexp  *regexp.Regexp
 }
 
 type FilterEntry struct {
@@ -70,6 +71,11 @@ func (l *Lineage) applyLineage(v *gozdef.VulnEvent) error {
 				return err
 			}
 			return nil
+		}
+	}
+	if l.defaultEntry != nil {
+		if err := l.defaultEntry.apply(v); err != nil {
+			return err
 		}
 	}
 	return nil
@@ -118,6 +124,7 @@ func loadFilter(path string) error {
 			var eptr *FilterEntry
 			eptr = &filter.Entries[i].Entries[j]
 			if eptr.Value == "" {
+				filter.Entries[i].defaultEntry = eptr
 				continue
 			}
 			eptr.valueRegexp, err = regexp.Compile(eptr.Value)
