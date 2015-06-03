@@ -11,6 +11,13 @@
 				"ok": true,
 				"description": "Current 1.23 release",
 				"entryts": "2015-05-28T18:30:00.000000+00:00"
+				},
+				{
+				"value": "",
+				"ok": false,
+				"description": "Out of date 1.23 release",
+				"entryts": "2015-05-28T18:30:00.000000+00:00",
+				"impact": "maximum"
 				}
 			]
 		},
@@ -22,6 +29,13 @@
 				"ok": true,
 				"description": "Current 1.24 release",
 				"entryts": "2015-05-28T18:30:00.000000+00:00"
+				},
+				{
+				"value": "",
+				"ok": false,
+				"description": "Out of date 1.24 release",
+				"entryts": "2015-05-28T18:30:00.000000+00:00",
+				"impact": "maximum"
 				}
 			]
 		},
@@ -33,7 +47,7 @@
 				"ok": false,
 				"description": "1.19 is EOL and is unsupported",
 				"entryts": "2015-05-28T18:30:00.000000+00:00",
-				"impact": "high"
+				"impact": "maximum"
 				}
 			]
 		},
@@ -45,7 +59,7 @@
 				"ok": false,
 				"description": "1.17 is EOL and is unsupported",
 				"entryts": "2015-05-28T18:30:00.000000+00:00",
-				"impact": "high"
+				"impact": "maximum"
 				}
 			]
 		},
@@ -57,7 +71,7 @@
 				"ok": false,
 				"description": "1.16 is EOL and is unsupported",
 				"entryts": "2015-05-28T18:30:00.000000+00:00",
-				"impact": "high"
+				"impact": "maximum"
 				}
 			]
 		},
@@ -69,7 +83,7 @@
 				"ok": false,
 				"description": "Revision not in filter list",
 				"entryts": "2015-05-28T18:30:00.000000+00:00",
-				"impact": "high"
+				"impact": "maximum"
 				}
 			]
 		}
