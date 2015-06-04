@@ -44,8 +44,23 @@ type FilterEntry struct {
 	valueRegexp *regexp.Regexp
 }
 
+var cveCache map[string]govfeed.GVCVE
+
 var filter Filter
 var defaultLineage *Lineage
+
+func getCVE(cve string) (govfeed.GVCVE, error) {
+	x, ok := cveCache[cve]
+	if ok {
+		return x, nil
+	}
+	x, err := govfeed.GVQuery(cve)
+	if err != nil {
+		return x, err
+	}
+	cveCache[cve] = x
+	return x, nil
+}
 
 func (f *FilterEntry) apply(v *gozdef.VulnEvent, cves []string) error {
 	if f.Ok {
@@ -66,7 +81,7 @@ func (f *FilterEntry) apply(v *gozdef.VulnEvent, cves []string) error {
 	if useVFeed != "" {
 		maxcvss := 0.0
 		for _, x := range v.Vuln.CVE {
-			cvedata, err := govfeed.GVQuery(x)
+			cvedata, err := getCVE(x)
 			if err != nil {
 				return err
 			}

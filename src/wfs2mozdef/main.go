@@ -141,6 +141,7 @@ func main() {
 			fmt.Fprintf(os.Stderr, "error: %v\n", err)
 			os.Exit(1)
 		}
+		cveCache = make(map[string]govfeed.GVCVE)
 	}
 
 	fd, err := os.Open(args[0])
