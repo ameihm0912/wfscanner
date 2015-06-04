@@ -27,11 +27,46 @@
 			"value": "^1\\.7",
 			"filters": [
 				{
-				"value": "^1\\.7\\.8$",
+				"value": "^1\\.7\\.9$",
 				"type": "anchor",
 				"ok": true,
 				"description": "Current 1.7 release",
 				"entryts": "2015-05-29T18:30:00.000000+00:00"
+				},
+				{
+				"value": "^1\\.7\\.8$",
+				"type": "anchor",
+				"ok": true,
+				"description": "1.7.8 release",
+				"entryts": "2015-05-29T18:30:00.000000+00:00"
+				},
+				{
+				"value": "^1\\.7\\.7$",
+				"type": "anchor",
+				"ok": true,
+				"description": "1.7.7 release",
+				"entryts": "2015-05-29T18:30:00.000000+00:00"
+				},
+				{
+				"type": "cve",
+				"cves": [
+					"CVE-2015-2317",
+					"CVE-2015-2316"
+				]
+				},
+				{
+				"value": "^1\\.7\\.6",
+				"type": "anchor",
+				"ok": false,
+				"description": "1.7.6 release",
+				"entryts": "2015-05-29T18:30:00.000000+00:00",
+				"impact": "maximum"
+				},
+				{
+				"type": "cve",
+				"cves": [
+					"CVE-2015-2241"
+				]
 				},
 				{
 				"value": "^1\\.7\\.",
