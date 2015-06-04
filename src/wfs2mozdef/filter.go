@@ -80,6 +80,17 @@ func (f *FilterEntry) apply(v *gozdef.VulnEvent, cves []string) error {
 		v.Vuln.CVSS = maxcvss
 	}
 
+	if v.Vuln.CVSS == 0.0 && v.Vuln.ImpactLabel != "" {
+		switch v.Vuln.ImpactLabel {
+		case "maximum":
+			v.Vuln.CVSS = 10.0
+		case "high":
+			v.Vuln.CVSS = 9.0
+		case "mediumlow":
+			v.Vuln.CVSS = 7.0
+		}
+	}
+
 	return nil
 }
 
