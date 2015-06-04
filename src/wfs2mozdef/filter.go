@@ -73,6 +73,9 @@ func (f *FilterEntry) apply(v *gozdef.VulnEvent, cves []string) error {
 			if cvedata.CVSS > maxcvss {
 				maxcvss = cvedata.CVSS
 			}
+
+			cvedesc := fmt.Sprintf("%v: %v", x, cvedata.Description)
+			v.Vuln.CVEText = append(v.Vuln.CVEText, cvedesc)
 		}
 		v.Vuln.CVSS = maxcvss
 	}
