@@ -10,6 +10,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ameihm0912/govfeed/src/govfeed"
 	"github.com/ameihm0912/gozdef"
 	"io/ioutil"
 	"os"
@@ -61,6 +62,21 @@ func (f *FilterEntry) apply(v *gozdef.VulnEvent, cves []string) error {
 		v.Vuln.ImpactLabel = f.Impact
 	}
 	v.Vuln.CVE = cves
+
+	if useVFeed != "" {
+		maxcvss := 0.0
+		for _, x := range v.Vuln.CVE {
+			cvedata, err := govfeed.GVQuery(x)
+			if err != nil {
+				return err
+			}
+			if cvedata.CVSS > maxcvss {
+				maxcvss = cvedata.CVSS
+			}
+		}
+		v.Vuln.CVSS = maxcvss
+	}
+
 	return nil
 }
 

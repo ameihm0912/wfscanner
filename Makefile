@@ -10,6 +10,7 @@ depends:
 	$(GO) get camlistore.org/pkg/misc/pinentry
 	$(GO) get github.com/streadway/amqp
 	$(GO) get github.com/ameihm0912/gozdef
+	$(GO) get github.com/ameihm0912/govfeed/src/govfeed
 
 wfs:
 	$(GO) install wfs

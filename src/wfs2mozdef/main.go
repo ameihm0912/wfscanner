@@ -13,6 +13,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/ameihm0912/govfeed/src/govfeed"
 	"github.com/ameihm0912/gozdef"
 	"os"
 	"strconv"
@@ -31,6 +32,7 @@ var apic gozdef.ApiConf
 
 var mozdef string
 var aidFile string
+var useVFeed string
 var sourceName string
 var vulnEvents []gozdef.VulnEvent
 
@@ -108,6 +110,7 @@ func main() {
 	flag.StringVar(&aidFile, "a", "", "asset id file")
 	flag.StringVar(&filterPath, "f", "", "load and use filter at path")
 	flag.StringVar(&mozdef, "m", "", "post json data to MozDef")
+	flag.StringVar(&useVFeed, "v", "", "path to vFeed CLI")
 	flag.Parse()
 	args := flag.Args()
 
@@ -126,6 +129,14 @@ func main() {
 
 	if filterPath != "" {
 		err := loadFilter(filterPath)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			os.Exit(1)
+		}
+	}
+
+	if useVFeed != "" {
+		err := govfeed.GVInit(useVFeed)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error: %v\n", err)
 			os.Exit(1)
