@@ -38,6 +38,7 @@ type FilterEntry struct {
 	Ok          bool      `json:"ok"`
 	EntryTS     time.Time `json:"entryts"`
 	Impact      string    `json:"impact"`
+	CVEList     []string  `json:"cves"`
 
 	valueRegexp *regexp.Regexp
 }
@@ -45,7 +46,7 @@ type FilterEntry struct {
 var filter Filter
 var defaultLineage *Lineage
 
-func (f *FilterEntry) apply(v *gozdef.VulnEvent) error {
+func (f *FilterEntry) apply(v *gozdef.VulnEvent, cves []string) error {
 	if f.Ok {
 		v.Vuln.Status = "closed"
 	} else {
@@ -59,26 +60,32 @@ func (f *FilterEntry) apply(v *gozdef.VulnEvent) error {
 	if f.Impact != "" {
 		v.Vuln.ImpactLabel = f.Impact
 	}
+	v.Vuln.CVE = cves
 	return nil
 }
 
 func (l *Lineage) applyLineage(v *gozdef.VulnEvent) error {
+	cveRunning := make([]string, 0)
+
 	for _, x := range l.Entries {
 		if x.Type != "anchor" {
+			if x.Type == "cve" {
+				cveRunning = append(cveRunning, x.CVEList...)
+			}
 			continue
 		}
 		if x.valueRegexp == nil {
 			continue
 		}
 		if x.valueRegexp.MatchString(v.Vuln.Description) {
-			if err := x.apply(v); err != nil {
+			if err := x.apply(v, cveRunning); err != nil {
 				return err
 			}
 			return nil
 		}
 	}
 	if l.defaultEntry != nil {
-		if err := l.defaultEntry.apply(v); err != nil {
+		if err := l.defaultEntry.apply(v, cveRunning); err != nil {
 			return err
 		}
 	}
