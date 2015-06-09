@@ -81,6 +81,11 @@ func (f *FilterEntry) apply(v *gozdef.VulnEvent, cves []string) error {
 	if useVFeed != "" {
 		maxcvss := 0.0
 		for _, x := range v.Vuln.CVE {
+			if x == "others" {
+				maxcvss = 10.0
+				v.Vuln.CVEText = append(v.Vuln.CVEText, "others: Other CVEs are also applicable")
+				continue
+			}
 			cvedata, err := getCVE(x)
 			if err != nil {
 				return err
