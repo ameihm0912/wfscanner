@@ -44,6 +44,7 @@ var pathOverride string
 var targetOverride string
 var expiryOverride string
 var nameOverride string
+var inputFile string
 
 func printResults(res []Result) {
 	for _, x := range res {
@@ -96,6 +97,8 @@ func loadDescriptor(descname string, dirpath string) (ret descriptor, err error)
 
 func main() {
 	var confpath string
+
+	inputFile = "./migquery-fmt.txt"
 
 	flag.StringVar(&confpath, "c", "./wfs.cfg", "path to wfs.cfg")
 	flag.StringVar(&targetOverride, "t", "", "override descriptor mig target")

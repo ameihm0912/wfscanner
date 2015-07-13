@@ -24,6 +24,27 @@ func migGetCandidates(desc descriptorMig) (cand []fileCandidate, err error) {
 		pfre = regexp.MustCompile(desc.PostFilter)
 	}
 
+	if inputFile != "" {
+		fd, err := os.Open(inputFile)
+		if err != nil {
+			return cand, err
+		}
+		defer fd.Close()
+		scanner := bufio.NewScanner(fd)
+		for scanner.Scan() {
+			buf := scanner.Text()
+			if buf == "" {
+				continue
+			}
+			elem := strings.Fields(buf)
+			if len(elem) < 2 {
+				return cand, fmt.Errorf("malformed input file")
+			}
+			cand = append(cand, fileCandidate{elem[0], elem[1]})
+		}
+		return cand, nil
+	}
+
 	migargs, err := desc.buildMigArguments()
 	if err != nil {
 		return cand, err
